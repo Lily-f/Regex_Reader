@@ -1,4 +1,5 @@
 require_relative 'wild_element'
+require_relative 'group_element'
 # See doc for notes a pseudo code
 
 # set up method to read and store the regex. verify the regex is being read properly
@@ -7,8 +8,9 @@ require_relative 'wild_element'
 # test against the given files. This step might need to be done sooner in the process to prevent wasted work
 # write report or something i guess
 
-# maybe create a class for each type of element and have a super type 'element'
 # File.foreach('words.txt') { |line| puts line}
 
-WildElement.new(false).display
+puts WildElement.new(false).to_s
+
+puts GroupElement.new(false, [WildElement.new(true)]).to_s
 

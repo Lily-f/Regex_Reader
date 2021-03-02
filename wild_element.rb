@@ -1,7 +1,7 @@
 require_relative 'regex_element'
 # A Wild character
 class WildElement < RegexElement
-  def display
-    puts ". r=#{@repeatable}"
+  def to_s
+    ". r=#{@repeatable}"
   end
 end

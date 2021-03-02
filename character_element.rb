@@ -6,7 +6,7 @@ class CharacterElement < RegexElement
     super(repeatable)
   end
 
-  def display
-    puts "Value: #{@value}"
+  def to_s
+    "Value: #{@value}"
   end
 end
