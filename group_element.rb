@@ -8,7 +8,6 @@ class GroupElement < RegexElement
 
   def to_s
     element_string = ''
-
     @elements.each { |elem| element_string.concat elem.to_s }
     "(#{element_string})"
   end
