@@ -1,12 +1,14 @@
 require_relative 'regex_element'
+
 # A specific ASCII character that doesn't represent another element
 class CharacterElement < RegexElement
-  def initialize(value, repeatable)
+  def initialize(is_repeatable, value)
     @value = value
-    super(repeatable)
+    super(is_repeatable)
   end
 
+  # Convert this character element into string representation
   def to_s
-    "Value: #{@value}"
+    "#{@value}:#{@is_repeatable}"
   end
 end

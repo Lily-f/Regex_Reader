@@ -1,8 +1,8 @@
 # Superclass of any regex element for verification
 class RegexElement
 
-  def initialize(repeatable)
-    @repeatable = repeatable
+  def initialize(is_repeatable)
+    @is_repeatable = is_repeatable
   end
 
 end

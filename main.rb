@@ -1,6 +1,7 @@
 require_relative 'wild_element'
 require_relative 'group_element'
 require_relative 'alternate_element'
+require_relative 'character_element'
 # See doc for notes a pseudo code
 
 # set up method to read and store the regex. verify the regex is being read properly
@@ -15,46 +16,88 @@ require_relative 'alternate_element'
 
 
 def read_regex(regex)
-
   characters = regex.chars
   puts "regex: #{characters}"
 
+  depth = 0
   elements = []
+  group_stack = []
+  alternation_stack = []
 
-  index = 0
-  while index < characters.length
-    puts "index: #{index}"
+  cursor = 0
+  while cursor < characters.length
 
-    elements << case characters[index]
-                when '.'
-                  WildElement.new(false)
-                when '('
-                  GroupElement.new(false, [])
-                when ')'
-                  ')'
-                when '*'
-                  '*'
-                when '|'
-                  AlternateElement.new(false, [])
-                else
-                  characters[index]
-                end
+    # Read the character the cursor is pointed at and the next character if available
+    char = characters[cursor]
+    read_ahead = cursor < characters.length - 1 ? characters[cursor + 1] : nil
+    # if last char and is alternation, add empty option to alternation?
 
-    puts(elements.at(elements.length - 1).to_s)
-    index += 1
+    # Check if current element is repeatable
+    is_repeatable = false
+    if read_ahead == '*'
+      is_repeatable = true
+      cursor += 1
+    end
+
+    # Check if current element is alternation
+    if char == '|'
+
+      # put elements from this depth into alternation, and read ahead
+      # Gather past elements from group stack and element array at this level and store as array
+      previous_elements = []
+      unless group_stack.last.nil?
+        puts 'found a group'
+      end
+
+      # If alternation is depth 0, move elements array to be first option
+      if depth.zero?
+        elements.each { |elem| previous_elements << elem }
+        elements.clear
+      end
+
+      existing_alternation = alternation_stack.find { |alt| alt.depth == depth }
+      if existing_alternation.nil?
+        alternation = AlternateElement.new(depth, previous_elements)
+        alternation_stack.push(alternation)
+      else
+        previous_elements.each { |elem| existing_alternation.fill_option(elem) }
+        existing_alternation.add_option
+      end
+      cursor += 1
+      next
+    end
+
+    # handle element storage
+    if !alternation_stack.last.nil? && alternation_stack.last.depth == depth
+      temp = create_element(char, is_repeatable, depth)
+      alternation_stack.last.fill_option(temp)
+      puts alternation_stack.last.to_s
+    else
+      elements << create_element(char, is_repeatable, depth)
+    end
+
+    cursor += 1
   end
-
+  # Check alternation stack only has 1 entry and put onto array of elements
+  puts elements.join(', ')
 end
 
-read_regex('ab.|(cd)*')
+# Creates a regex element from a given character and attributes
+def create_element(character, is_repeatable, depth)
+  case character
+  when '.'
+    WildElement.new(is_repeatable)
+  when '('
+    GroupElement.new(is_repeatable, depth)
+  else
+    CharacterElement.new(is_repeatable, character)
+  end
+end
 
-# puts WildElement.new(false).to_s
-# puts GroupElement.new(false, [WildElement.new(true)]).to_s
-
-# What follows is pseudo code on how this program will run
+read_regex('ac*|b*')
 
 # reach characters until an element is made. Give this element a depth based on group positions (base is depth 0)
-# if this element is NOT an alternate NOR alternation then read ahead by one
+# if this element is NOT an alternate then read ahead by one
 
 # if this extra one is an alternation character then handle: create alt element using the current read characters,
 # and store current elements from same group level or greater inside the alternation element as ONE of the options.
@@ -66,12 +109,8 @@ read_regex('ab.|(cd)*')
 # this is so that if the alternation contains groups,
 # the groups will be added to the alternation instead of the elements
 # Note this is only for groups within the alternation, not groups at a lower depth
-# Note that alternations can only exist within another alternation if inside a group TODO: HANDLE
+# Note that alternations can only exist within another alternation if inside a group
 # need alternation stack like group stack. same rules apply though, just prevents loss of info
-
-# ELSE if is an asterisk then set the original element as repeatable. Note repeatable is [0..infinity] times
-# if the extra char was not either an asterisk or pipe then after handling the original element,
-# set it as original element and repeat until there are no characters
 
 # if an open bracket is read then handle groups like so:
 # create a group element that is initially empty. store group onto stack of groups. Then repeat the above methods
@@ -90,4 +129,3 @@ read_regex('ab.|(cd)*')
 # remove group from stack and add to alternation. If depth is now lower than alternation then
 # move alternation to elements
 # only add elements directly to elements array if there are no groups or alternations in either stack
-# TODO: Handle group and alternation behavior when combined
