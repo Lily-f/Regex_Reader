@@ -30,7 +30,6 @@ def read_regex(regex)
     # Read the character the cursor is pointed at and the next character if available
     char = characters[cursor]
     read_ahead = cursor < characters.length - 1 ? characters[cursor + 1] : nil
-    # if last char and is alternation, add empty option to alternation?
 
     # Check if current element is repeatable
     is_repeatable = false
@@ -71,14 +70,14 @@ def read_regex(regex)
     if !alternation_stack.last.nil? && alternation_stack.last.depth == depth
       temp = create_element(char, is_repeatable, depth)
       alternation_stack.last.fill_option(temp)
-      puts alternation_stack.last.to_s
     else
       elements << create_element(char, is_repeatable, depth)
     end
-
     cursor += 1
   end
+
   # Check alternation stack only has 1 entry and put onto array of elements
+  elements << alternation_stack.pop
   puts elements.join(', ')
 end
 
