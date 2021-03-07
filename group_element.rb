@@ -2,12 +2,12 @@ require_relative 'regex_element'
 
 # A group of elements. Each must return true in order to evaluate to true
 class GroupElement < RegexElement
-  attr_accessor :elements
+  attr_accessor :is_repeatable, :depth
 
-  def initialize(is_repeatable, depth)
+  def initialize(depth)
     @elements = []
     @depth = depth
-    super(is_repeatable)
+    super
   end
 
   # Add a regex element to the array of elements this group contains
@@ -19,6 +19,6 @@ class GroupElement < RegexElement
   def to_s
     element_string = '('
     @elements.each { |elem| element_string.concat("#{elem},") }
-    "#{element_string.delete_suffix(',')})"
+    "#{element_string.delete_suffix(',')}):#{is_repeatable}"
   end
 end
