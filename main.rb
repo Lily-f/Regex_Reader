@@ -7,7 +7,7 @@ require_relative 'character_element'
 # set up reading of strings that will be verified against the regex.
 # set up verification process. Test it. make tests?
 # test against the given files. This step might need to be done sooner in the process to prevent wasted work
-# write report or something i guess
+# write report
 
 # Note that alternate elements stretch as far as they can, stopping only for a bracket, another pipe, or no characters
 
@@ -40,6 +40,7 @@ class Regex1
     # Check if current element is repeatable
     is_repeatable = false
     if read_ahead == '*'
+      raise 'SYNTAX ERROR' if char == '|'
       is_repeatable = true
       @cursor += 1
     end
@@ -78,11 +79,11 @@ class Regex1
 
     when '('
       @depth += 1
-      GroupElement.new
+      GroupElement.new(@depth)
     when ')'
       raise 'SYNTAX ERROR' if @depth.zero?
 
-      @elements.last.close_group
+      @elements.last.close_group(@depth)
       @depth -= 1
       nil
 
@@ -96,4 +97,4 @@ class Regex1
   end
 end
 
-Regex1.new.read_regex('a|b|(cd)*')
+Regex1.new.read_regex('((a|b)|(d|e))')

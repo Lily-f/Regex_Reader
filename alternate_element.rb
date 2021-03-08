@@ -29,8 +29,8 @@ class AlternateElement < RegexElement
     end
   end
 
-  def close_group
-    @options.last.last.close_group
+  def close_group(depth)
+    @options.last.last.close_group(depth)
   end
 
   def nested_child?

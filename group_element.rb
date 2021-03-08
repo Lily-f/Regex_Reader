@@ -5,7 +5,8 @@ require_relative 'alternate_element'
 class GroupElement < RegexElement
   attr_accessor :is_repeatable, :elements, :container
 
-  def initialize
+  def initialize(depth)
+    @depth = depth
     @elements = []
     @container = true
     super(false)
@@ -20,11 +21,12 @@ class GroupElement < RegexElement
     end
   end
 
-  def close_group
-    if @container
+  def close_group(depth)
+
+    if @depth == depth
       @container = false
     else
-      @elements.last.close_group
+      @elements.last.close_group(depth)
     end
   end
 
