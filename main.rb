@@ -2,7 +2,6 @@ require_relative 'wild_element'
 require_relative 'group_element'
 require_relative 'alternate_element'
 require_relative 'character_element'
-# See doc for notes a pseudo code
 
 # set up method to read and store the regex. verify the regex is being read properly
 # set up reading of strings that will be verified against the regex.
@@ -17,23 +16,17 @@ class Regex1
   def initialize
     @depth = 0
     @elements = []
-    @group_stack = []
-    @alternation_stack = []
     @cursor = 0
   end
 
   def read_regex(regex)
     characters = regex.chars
     puts "regex: #{characters}"
-    while @cursor < characters.length
-      return unless read_character(characters)
-    end
+    read_character(characters) while @cursor < characters.length
 
-    if !@group_stack.empty?
-      puts 'SYNTAX ERROR'
+    if @depth.positive?
+      raise 'SYNTAX ERROR'
     else
-      # Check alternation stack only has 1 entry and put onto array of elements
-      @elements << @alternation_stack.pop if @alternation_stack.size == 1
       puts @elements.join(', ')
     end
   end
@@ -51,83 +44,15 @@ class Regex1
       @cursor += 1
     end
 
-    # Create element based on the type of character read
-    case char
-    when '|'
-      previous_elements = []
-      if @depth.zero?
-        @elements.each { |elem| previous_elements << elem }
-        @elements.clear
-      elsif !@group_stack.last.nil? && @group_stack.last.depth == @depth
-        while (elem = @group_stack.last.elements.shift)
-          previous_elements << elem
-        end
-      end
-
-      existing_alternation = @alternation_stack.find { |alt| alt.depth == @depth }
-      if existing_alternation.nil?
-        alternation = AlternateElement.new(@depth, previous_elements)
-        @alternation_stack.push(alternation)
-      else
-        previous_elements.each { |option| existing_alternation.fill_option(option) }
-        existing_alternation.add_option
-      end
-    when '('
-      @depth += 1
-      # If an alternation is at this level, add group to it
-      if !@alternation_stack.empty?
-        @alternation_stack.last.fill_option(GroupElement.new(@depth))
-        @alternation_stack.last.open_group = true
-      else
-        @group_stack << GroupElement.new(@depth)
-      end
-
-    when ')'
-      if !@alternation_stack.empty? && @alternation_stack.last.open_group
-        @alternation_stack.last.open_group = false
-        @alternation_stack.last.options.last.last.is_repeatable = is_repeatable
-
-      elsif !@group_stack.empty?
-        @group_stack.last.is_repeatable = is_repeatable
-        if !@alternation_stack.empty? && @alternation_stack.last.depth == @depth
-          @group_stack.last.add_element(@alternation_stack.pop)
-        end
-
-        # Add group to existing group if there is one
-        if @group_stack.size > 1
-          group = @group_stack.pop
-          @group_stack.last.add_element(group)
-        else
-          @elements << @group_stack.pop
-        end
-
-      else
-        # if group is in alternation, handle that
-        puts 'SYNTAX ERRORR'
-        return false
-      end
-      @depth -= 1
-
-    else
-      # handle element storage
-      store_element(char, is_repeatable)
-    end
-    true
+    # handle element storage
+    element = create_element(char, is_repeatable)
+    store_element(element) unless element.nil?
   end
 
   # Store base regex elements like chars and wilds inside the relevant group / alternation / base array
-  def store_element(char, is_repeatable)
-    element = create_element(char, is_repeatable)
-    if !@alternation_stack.empty? && !@group_stack.empty?
-      if @alternation_stack.last.depth >= @group_stack.last.depth
-        @alternation_stack.last.fill_option(element)
-      else
-        @group_stack.last.add_element(element)
-      end
-    elsif !@alternation_stack.empty?
-      @alternation_stack.last.fill_option(element)
-    elsif !@group_stack.empty?
-      @group_stack.last.add_element(element)
+  def store_element(element)
+    if nested_child?
+      @elements.last.add_element(element)
     else
       @elements << element
     end
@@ -135,12 +60,40 @@ class Regex1
 
   # Creates a regex element from a given character and attributes
   def create_element(char, is_repeatable)
-    if char == '.'
+    case char
+    when '.'
       WildElement.new(is_repeatable)
+
+    when '|'
+      previous_elements = []
+      if nested_child?
+        @elements.last.add_alternation
+        return nil
+      else
+        @elements.each { |elem| previous_elements << elem }
+        @elements.clear
+
+      end
+      AlternateElement.new(previous_elements)
+
+    when '('
+      @depth += 1
+      GroupElement.new
+    when ')'
+      raise 'SYNTAX ERROR' if @depth.zero?
+
+      @elements.last.close_group
+      @depth -= 1
+      nil
+
     else
       CharacterElement.new(is_repeatable, char)
     end
   end
+
+  def nested_child?
+    @elements.last.class.method_defined?('add_element') && @elements.last.container
+  end
 end
 
-Regex1.new.read_regex('ab|(c|v)*')
+Regex1.new.read_regex('a|b|(cd)*')
