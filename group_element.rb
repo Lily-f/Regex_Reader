@@ -2,7 +2,7 @@ require_relative 'regex_element'
 
 # A group of elements. Each must return true in order to evaluate to true
 class GroupElement < RegexElement
-  attr_accessor :is_repeatable, :depth
+  attr_accessor :is_repeatable, :depth, :elements
 
   def initialize(depth)
     @elements = []
