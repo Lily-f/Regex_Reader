@@ -3,15 +3,14 @@ require_relative 'group_element'
 require_relative 'alternate_element'
 require_relative 'character_element'
 
-# set up method to read and store the regex. verify the regex is being read properly
 # set up reading of strings that will be verified against the regex.
 # set up verification process. Test it. make tests?
 # test against the given files. This step might need to be done sooner in the process to prevent wasted work
 # write report
 
-# Note that alternate elements stretch as far as they can, stopping only for a bracket, another pipe, or no characters
-
 # File.foreach('words.txt') { |line| puts line}
+
+# Represents an array of regex elements with methods to read and create a regex from string
 class Regex1
   def initialize
     @depth = 0
@@ -19,18 +18,24 @@ class Regex1
     @cursor = 0
   end
 
-  def read_regex(regex)
+  # reads a given string and creates a regex from it
+  def read_regex(regex, message)
     characters = regex.chars
-    puts "regex: #{characters}"
-    read_character(characters) while @cursor < characters.length
+    begin
+      read_character(characters) while @cursor < characters.length
+    rescue RuntimeError
+      puts 'SYNTAX ERROR'
+      return
+    end
 
     if @depth.positive?
-      raise 'SYNTAX ERROR'
+      puts 'SYNTAX ERROR'
     else
-      puts @elements.join(', ')
+      verify_message(message)
     end
   end
 
+  # reads the next character from a given array and creates a regex element
   def read_character(characters)
     # Read the character the cursor is pointed at and the next character if available
     char = characters[@cursor]
@@ -41,6 +46,7 @@ class Regex1
     is_repeatable = false
     if read_ahead == '*'
       raise 'SYNTAX ERROR' if char == '|'
+
       is_repeatable = true
       @cursor += 1
     end
@@ -83,7 +89,7 @@ class Regex1
     when ')'
       raise 'SYNTAX ERROR' if @depth.zero?
 
-      @elements.last.close_group(@depth)
+      @elements.last.close_group(@depth, is_repeatable)
       @depth -= 1
       nil
 
@@ -92,9 +98,26 @@ class Regex1
     end
   end
 
+  # Checks if the last element is an open group that nests
   def nested_child?
     @elements.last.class.method_defined?('add_element') && @elements.last.container
   end
+
+  # Verify a message is accepted by this regex
+  def verify_message(message)
+    characters = message.chars
+
+    if @elements.all? do |element|
+      characters = element.evaluate(characters)
+      characters != false
+    end && characters.empty?
+      puts 'YES'
+    else
+      puts 'NO'
+    end
+  end
+
 end
 
-Regex1.new.read_regex('((a|b)|(d|e))')
+Regex1.new.read_regex('(ab)*c', 'c')
+

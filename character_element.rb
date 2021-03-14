@@ -7,6 +7,18 @@ class CharacterElement < RegexElement
     super(is_repeatable)
   end
 
+  def evaluate(characters)
+
+    if @is_repeatable
+      characters = characters.drop(1) while characters.first == @value
+      characters
+    elsif characters.first == @value
+      characters.drop(1)
+    else
+      false
+    end
+  end
+
   # Convert this character element into string representation
   def to_s
     "#{@value}:#{@is_repeatable}"

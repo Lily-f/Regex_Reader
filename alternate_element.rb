@@ -29,12 +29,16 @@ class AlternateElement < RegexElement
     end
   end
 
-  def close_group(depth)
-    @options.last.last.close_group(depth)
+  def close_group(depth, is_repeatable)
+    @options.last.last.close_group(depth, is_repeatable)
   end
 
   def nested_child?
     @options.last.last.class.method_defined?('add_element') && @options.last.last.container
+  end
+
+  def evaluate(characters)
+
   end
 
   # Convert this alternative element into string representation

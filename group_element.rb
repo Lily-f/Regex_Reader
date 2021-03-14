@@ -21,10 +21,11 @@ class GroupElement < RegexElement
     end
   end
 
-  def close_group(depth)
+  def close_group(depth, is_repeatable)
 
     if @depth == depth
       @container = false
+      @is_repeatable = is_repeatable
     else
       @elements.last.close_group(depth)
     end
@@ -43,6 +44,29 @@ class GroupElement < RegexElement
 
   def open_child?
     @elements.last.class.method_defined?('add_element') && @elements.last.container
+  end
+
+  def evaluate(characters)
+    if @is_repeatable
+      repeating = true
+      while repeating
+        temp_characters = characters
+        repeating = @elements.all? do |element|
+          temp_characters = element.evaluate(temp_characters)
+          temp_characters != false
+        end
+        characters = temp_characters if repeating
+      end
+      characters
+
+    elsif @elements.all? do |element|
+      characters = element.evaluate(characters)
+      characters != false
+    end
+      characters
+    else
+      false
+    end
   end
 
   # Convert this group element into string representation
