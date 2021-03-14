@@ -119,5 +119,5 @@ class Regex1
 
 end
 
-Regex1.new.read_regex('(ab)*c', 'c')
+Regex1.new.read_regex('', '')
 

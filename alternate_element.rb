@@ -39,6 +39,18 @@ class AlternateElement < RegexElement
 
   def evaluate(characters)
 
+    final_characters = false
+    @options.each do |option_elements|
+      temp_characters = characters
+      next unless option_elements.all? do |element|
+        temp_characters = element.evaluate(temp_characters)
+        temp_characters != false
+      end
+
+      final_characters = temp_characters
+    end
+
+    final_characters
   end
 
   # Convert this alternative element into string representation
