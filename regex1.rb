@@ -3,13 +3,6 @@ require_relative 'group_element'
 require_relative 'alternate_element'
 require_relative 'character_element'
 
-# set up reading of strings that will be verified against the regex.
-# set up verification process. Test it. make tests?
-# test against the given files. This step might need to be done sooner in the process to prevent wasted work
-# write report
-
-# File.foreach('words.txt') { |line| puts line}
-
 # Represents an array of regex elements with methods to read and create a regex from string
 class Regex1
   def initialize
@@ -19,7 +12,7 @@ class Regex1
   end
 
   # reads a given string and creates a regex from it
-  def read_regex(regex, message)
+  def run_regex(regex, message)
     characters = regex.chars
     begin
       read_character(characters) while @cursor < characters.length
@@ -28,6 +21,7 @@ class Regex1
       return
     end
 
+    # Check all groups ar closed
     if @depth.positive?
       puts 'SYNTAX ERROR'
     else
@@ -53,11 +47,8 @@ class Regex1
 
     # handle element storage
     element = create_element(char, is_repeatable)
-    store_element(element) unless element.nil?
-  end
+    return if element.nil?
 
-  # Store base regex elements like chars and wilds inside the relevant group / alternation / base array
-  def store_element(element)
     if nested_child?
       @elements.last.add_element(element)
     else
@@ -68,9 +59,11 @@ class Regex1
   # Creates a regex element from a given character and attributes
   def create_element(char, is_repeatable)
     case char
+    # Create wild
     when '.'
       WildElement.new(is_repeatable)
 
+    # Open alternation, collect previous elements at current depth
     when '|'
       previous_elements = []
       if nested_child?
@@ -83,9 +76,12 @@ class Regex1
       end
       AlternateElement.new(previous_elements)
 
+    # Open new group
     when '('
       @depth += 1
       GroupElement.new(@depth)
+
+    # Try close group at current depth
     when ')'
       raise 'SYNTAX ERROR' if @depth.zero?
 
@@ -93,6 +89,7 @@ class Regex1
       @depth -= 1
       nil
 
+    # else ASCII element
     else
       CharacterElement.new(is_repeatable, char)
     end
@@ -116,8 +113,20 @@ class Regex1
       puts 'NO'
     end
   end
-
 end
 
-Regex1.new.read_regex('', '')
+# Collect execution arguments
+input_array = ARGV
 
+# must have 2 arguments, for regex file and string file
+if input_array.length != 2
+  puts 'ERROR'
+  return
+end
+
+# Ensure arguments are txt files
+input_array[0] = "#{input_array[0]}.txt" if input_array[0][-4..-1] != '.txt'
+input_array[1] = "#{input_array[1]}.txt" if input_array[1][-4..-1] != '.txt'
+
+# File.foreach('words.txt') { |line| puts line}
+# Regex1.new.run_regex('ab|c', 'c')

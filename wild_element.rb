@@ -3,6 +3,7 @@ require_relative 'regex_element'
 # A Wild character
 class WildElement < RegexElement
 
+  # evaluate characters against this regex element
   def evaluate(characters)
     if @is_repeatable
       []

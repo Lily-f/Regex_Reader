@@ -1,5 +1,0 @@
-hey this is a sentance
-howwillwhitespacebehandled
-Pascel Case Rules
-snake_case_rules
-mouse

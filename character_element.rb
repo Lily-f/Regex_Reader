@@ -7,6 +7,7 @@ class CharacterElement < RegexElement
     super(is_repeatable)
   end
 
+  # evaluate characters against this regex element
   def evaluate(characters)
 
     if @is_repeatable

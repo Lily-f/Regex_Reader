@@ -14,25 +14,26 @@ class GroupElement < RegexElement
 
   # Add a regex element to the array of elements this group contains
   def add_element(element)
-    if open_child?
+    if nested_child?
       @elements.last.add_element(element)
     else
       @elements << element
     end
   end
 
+  # Close group or nested group
   def close_group(depth, is_repeatable)
-
     if @depth == depth
       @container = false
       @is_repeatable = is_repeatable
     else
-      @elements.last.close_group(depth)
+      @elements.last.close_group(depth, is_repeatable)
     end
   end
 
+  # add alternation to open child if available, else this group
   def add_alternation
-    if open_child?
+    if nested_child?
       @elements.last.add_alternation
     else
       previous_elements = []
@@ -42,10 +43,12 @@ class GroupElement < RegexElement
     end
   end
 
-  def open_child?
+  # Checks if this group contains an open group / alternation
+  def nested_child?
     @elements.last.class.method_defined?('add_element') && @elements.last.container
   end
 
+  # evaluate characters against this regex element
   def evaluate(characters)
     if @is_repeatable
       repeating = true

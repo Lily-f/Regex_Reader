@@ -12,6 +12,7 @@ class AlternateElement < RegexElement
     super(false)
   end
 
+  # Add a regex element to the array of elements this group contains
   def add_element(element)
     if nested_child?
       @options.last.last.add_element(element)
@@ -20,6 +21,7 @@ class AlternateElement < RegexElement
     end
   end
 
+  # add alternation to open child if available, else this group
   def add_alternation
     if nested_child?
       @options.last.last.add_alternation
@@ -29,14 +31,17 @@ class AlternateElement < RegexElement
     end
   end
 
+  # Close group or nested group
   def close_group(depth, is_repeatable)
     @options.last.last.close_group(depth, is_repeatable)
   end
 
+  # Checks if this alternation contains an open group / alternation
   def nested_child?
     @options.last.last.class.method_defined?('add_element') && @options.last.last.container
   end
 
+  # evaluate characters against this regex element
   def evaluate(characters)
 
     final_characters = false
