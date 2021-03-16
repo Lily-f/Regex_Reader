@@ -40,19 +40,19 @@ class AlternateElement < RegexElement
 
   # evaluate characters against this regex element
   def evaluate(characters)
+
+    # Create array of all options that verify
     possible_answers = []
-
     @options.each do |option|
-      next if option == [] && characters != []
-
       temp_characters = characters
       next unless option.all? do |element|
         temp_characters = element.evaluate(temp_characters)
         temp_characters != false
       end
-
       possible_answers << temp_characters
     end
+
+    # return option that verifies the most characters
     return false if possible_answers.empty?
     possible_answers.min_by(&:length)
   end

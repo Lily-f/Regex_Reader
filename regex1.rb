@@ -52,6 +52,7 @@ class Regex1
     element = create_element(char, is_repeatable)
     return if element.nil?
 
+    # Put elements as deep as possible
     if nested_child?
       @elements.last.add_element(element)
     else
@@ -142,6 +143,7 @@ strings = []
 File.foreach(input_array[0]) { |line| regexes << line.chomp! }
 File.foreach(input_array[1]) { |line| strings << line.chomp! }
 
+# Check same number of regexes and strings
 if regexes.length != strings.length
   puts 'ERROR'
   return

@@ -50,6 +50,8 @@ class GroupElement < RegexElement
 
   # evaluate characters against this regex element
   def evaluate(characters)
+
+    # If repeating, consume as many characters as possible while verification is true
     if @is_repeatable
       repeating = true
       while repeating
@@ -62,6 +64,7 @@ class GroupElement < RegexElement
       end
       characters
 
+    # If not repeating, check all elements in group verify
     elsif @elements.all? do |element|
       characters = element.evaluate(characters)
       characters != false
