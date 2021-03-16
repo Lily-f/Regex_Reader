@@ -9,7 +9,6 @@ class CharacterElement < RegexElement
 
   # evaluate characters against this regex element
   def evaluate(characters)
-
     if @is_repeatable
       characters = characters.drop(1) while characters.first == @value
       characters

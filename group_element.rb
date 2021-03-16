@@ -56,7 +56,7 @@ class GroupElement < RegexElement
         temp_characters = characters
         repeating = @elements.all? do |element|
           temp_characters = element.evaluate(temp_characters)
-          temp_characters != false
+          temp_characters != false && temp_characters.length != characters.length
         end
         characters = temp_characters if repeating
       end

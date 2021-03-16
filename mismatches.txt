@@ -1,0 +1,54 @@
+Mismatch on line 94:
+  Expected: YES: |b with b
+  But got:  NO
+Mismatch on line 113:
+  Expected: YES: .|.. with ab
+  But got:  NO
+Mismatch on line 125:
+  Expected: YES: (ab|.)(|d) with abd
+  But got:  NO
+Mismatch on line 127:
+  Expected: YES: (ab|.)(|d) with Xd
+  But got:  NO
+Mismatch on line 135:
+  Expected: YES: .|... with xyz
+  But got:  NO
+Mismatch on line 248:
+  Expected: YES: ((hello|hi) (world|earth)! )* with hello world! 
+  But got:  NO
+Mismatch on line 249:
+  Expected: YES: ((hello|hi) (world|earth)! )* with hi world! 
+  But got:  NO
+Mismatch on line 250:
+  Expected: YES: ((hello|hi) (world|earth)! )* with hi earth! 
+  But got:  NO
+Mismatch on line 251:
+  Expected: YES: ((hello|hi) (world|earth)! )* with hello earth! 
+  But got:  NO
+Mismatch on line 252:
+  Expected: YES: ((hello|hi) (world|earth)! )* with hello world! hi earth! 
+  But got:  NO
+Mismatch on line 253:
+  Expected: YES: ((hello|hi) (world|earth)! )* with hi earth! hello world! hi world! 
+  But got:  NO
+Mismatch on line 262:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <a>b</a>
+  But got:  NO
+Mismatch on line 263:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <a>b</c>
+  But got:  NO
+Mismatch on line 264:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <>b</a>
+  But got:  NO
+Mismatch on line 265:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <a href="#"></a>
+  But got:  NO
+Mismatch on line 267:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <></><>
+  But got:  NO
+Mismatch on line 268:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <a>b</a><b>a</b>
+  But got:  NO
+Mismatch on line 269:
+  Expected: YES: (<.*>(.*)</(.*)>)* with <br /><a href="#hello">hi</a>
+  But got:  NO

@@ -26,7 +26,6 @@ class AlternateElement < RegexElement
     if nested_child?
       @options.last.last.add_alternation
     else
-      puts 'ree'
       @options << []
     end
   end
@@ -44,18 +43,26 @@ class AlternateElement < RegexElement
   # evaluate characters against this regex element
   def evaluate(characters)
 
-    final_characters = false
-    @options.each do |option_elements|
+    @options.each do |option|
       temp_characters = characters
-      next unless option_elements.all? do |element|
+      if option.all? do |element|
         temp_characters = element.evaluate(temp_characters)
         temp_characters != false
       end
-
-      final_characters = temp_characters
+        return temp_characters
+      end
     end
-
-    final_characters
+    false
+    #final_characters = false
+    #@options.each do |option_elements|
+    #  temp_characters = characters
+    #  next unless option_elements.all? do |element|
+    #    temp_characters = element.evaluate(temp_characters)
+    #    temp_characters != false
+    #  end
+    #  final_characters = temp_characters
+    #end
+    #final_characters}
   end
 
   # Convert this alternative element into string representation

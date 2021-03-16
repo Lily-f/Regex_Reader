@@ -36,6 +36,9 @@ class Regex1
     read_ahead = @cursor < characters.length - 1 ? characters[@cursor + 1] : nil
     @cursor += 1
 
+    # if first char is *, throw error
+    raise 'SYNTAX ERROR' if char == '*'
+
     # Check if current element is repeatable
     is_repeatable = false
     if read_ahead == '*'
@@ -71,6 +74,7 @@ class Regex1
         return nil
       else
         @elements.each { |elem| previous_elements << elem }
+        # puts previous_elements
         @elements.clear
 
       end
@@ -78,6 +82,8 @@ class Regex1
 
     # Open new group
     when '('
+      raise 'SYNTAX ERROR' if is_repeatable
+
       @depth += 1
       GroupElement.new(@depth)
 
@@ -115,6 +121,9 @@ class Regex1
   end
 end
 
+#Regex1.new.run_regex('hello.world', 'hello world')
+#return
+
 # Collect execution arguments
 input_array = ARGV
 
@@ -128,5 +137,22 @@ end
 input_array[0] = "#{input_array[0]}.txt" if input_array[0][-4..-1] != '.txt'
 input_array[1] = "#{input_array[1]}.txt" if input_array[1][-4..-1] != '.txt'
 
-# File.foreach('words.txt') { |line| puts line}
-# Regex1.new.run_regex('ab|c', 'c')
+# collect regexes and strings
+unless File.file?(input_array[0]) && File.file?(input_array[1])
+  puts 'ERROR'
+  return
+end
+regexes = []
+strings = []
+File.foreach(input_array[0]) { |line| regexes << line.strip }
+File.foreach(input_array[1]) { |line| strings << line.strip }
+
+if regexes.length != strings.length
+  puts 'ERROR'
+  return
+end
+
+regexes.length.times do |i|
+  #print("#{regexes[i].strip} with #{strings[i].strip}: ")
+  Regex1.new.run_regex(regexes[i], strings[i])
+end
