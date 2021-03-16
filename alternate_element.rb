@@ -1,8 +1,6 @@
 require_relative 'regex_element'
 
 # An element that will evaluate a string to true if one or more of its options evaluates true
-# # I'm not sure how to handle if more than one option returns true because it could mean that
-# different characters in the string would be read in different instances.
 class AlternateElement < RegexElement
   attr_accessor :options, :container
 
@@ -42,27 +40,21 @@ class AlternateElement < RegexElement
 
   # evaluate characters against this regex element
   def evaluate(characters)
+    possible_answers = []
 
     @options.each do |option|
+      next if option == [] && characters != []
+
       temp_characters = characters
-      if option.all? do |element|
+      next unless option.all? do |element|
         temp_characters = element.evaluate(temp_characters)
         temp_characters != false
       end
-        return temp_characters
-      end
+
+      possible_answers << temp_characters
     end
-    false
-    #final_characters = false
-    #@options.each do |option_elements|
-    #  temp_characters = characters
-    #  next unless option_elements.all? do |element|
-    #    temp_characters = element.evaluate(temp_characters)
-    #    temp_characters != false
-    #  end
-    #  final_characters = temp_characters
-    #end
-    #final_characters}
+    return false if possible_answers.empty?
+    possible_answers.min_by(&:length)
   end
 
   # Convert this alternative element into string representation

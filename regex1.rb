@@ -74,7 +74,6 @@ class Regex1
         return nil
       else
         @elements.each { |elem| previous_elements << elem }
-        # puts previous_elements
         @elements.clear
 
       end
@@ -109,7 +108,6 @@ class Regex1
   # Verify a message is accepted by this regex
   def verify_message(message)
     characters = message.chars
-
     if @elements.all? do |element|
       characters = element.evaluate(characters)
       characters != false
@@ -120,9 +118,6 @@ class Regex1
     end
   end
 end
-
-#Regex1.new.run_regex('hello.world', 'hello world')
-#return
 
 # Collect execution arguments
 input_array = ARGV
@@ -144,15 +139,12 @@ unless File.file?(input_array[0]) && File.file?(input_array[1])
 end
 regexes = []
 strings = []
-File.foreach(input_array[0]) { |line| regexes << line.strip }
-File.foreach(input_array[1]) { |line| strings << line.strip }
+File.foreach(input_array[0]) { |line| regexes << line.chomp! }
+File.foreach(input_array[1]) { |line| strings << line.chomp! }
 
 if regexes.length != strings.length
   puts 'ERROR'
   return
 end
 
-regexes.length.times do |i|
-  #print("#{regexes[i].strip} with #{strings[i].strip}: ")
-  Regex1.new.run_regex(regexes[i], strings[i])
-end
+regexes.length.times { |i| Regex1.new.run_regex(regexes[i], strings[i]) }
