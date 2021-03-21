@@ -109,10 +109,10 @@ class Regex1
   # Verify a message is accepted by this regex
   def verify_message(message)
     characters = message.chars
-    if @elements.all? do |element|
-      characters = element.evaluate(characters)
-      characters != false
-    end && characters.empty?
+    if @elements.all? { |element|
+         characters = element.evaluate(characters)
+         characters != false
+       } && characters.empty?
       puts 'YES'
     else
       puts 'NO'

@@ -56,19 +56,19 @@ class GroupElement < RegexElement
       repeating = true
       while repeating
         temp_characters = characters
-        repeating = @elements.all? do |element|
+        repeating = @elements.all? { |element|
           temp_characters = element.evaluate(temp_characters)
           temp_characters != false && temp_characters.length != characters.length
-        end
+        }
         characters = temp_characters if repeating
       end
       characters
 
     # If not repeating, check all elements in group verify
-    elsif @elements.all? do |element|
+    elsif @elements.all? { |element|
       characters = element.evaluate(characters)
       characters != false
-    end
+    }
       characters
     else
       false
